@@ -1,33 +1,3 @@
-
-// PWA bootstrap
-window.addEventListener('load', () => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js').catch(console.error);
-  }
-});
-
-// Warm up low-priority images after first render
-window.addEventListener('load', () => {
-  const lowPriorityImages = Array.from(document.querySelectorAll('img[loading="lazy"]'));
-  const warm = () => lowPriorityImages.forEach(img => {
-    if (!img.complete) {
-      const src = img.getAttribute('src');
-      if (src) {
-        const pre = new Image();
-        pre.decoding = 'async';
-        pre.src = src;
-      }
-    }
-  });
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(warm, { timeout: 1200 });
-  } else {
-    setTimeout(warm, 600);
-  }
-});
-
-
-
 (function(){
 const STAGE_W=2456, STAGE_H=3070, wrap=document.getElementById('wrap');
 const yearEl=document.getElementById('year'), year20El=document.getElementById('year20'), yearTensEl=document.getElementById('yearTens'), yearOnesEl=document.getElementById('yearOnes'), moEl=document.getElementById('mo'), tgEl=document.getElementById('tg'), woEl=document.getElementById('wo'), sEl=document.getElementById('s'), mtEl=document.getElementById('mt'), cmEl=document.getElementById('cm'), chEl=document.getElementById('ch'), hEl=document.getElementById('h'), mEl=document.getElementById('m'), csEl=document.getElementById('cs');
@@ -174,10 +144,21 @@ if(window.visualViewport){
   window.visualViewport.addEventListener('scroll', fitStage, {passive:true});
 }
 window.addEventListener('orientationchange', fitStage, {passive:true});
-fitStage(); render();
+function revealStage(){
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      wrap.classList.add('ready');
+    });
+  });
+}
+fitStage();
+render();
+revealStage();
+window.addEventListener('load', function(){
+  fitStage();
+  revealStage();
+}, {once:true});
 })();
-
-
 
 (function(){
   const tickSoftAudio = document.getElementById('tickSoftAudio');
@@ -274,8 +255,6 @@ fitStage(); render();
   setTimeout(syncTickMode, 2100);
 })();
 
-
-
 (function(){
   const hint = document.getElementById('chronoHint');
   const startStop = document.getElementById('pushStartStop');
@@ -299,8 +278,6 @@ fitStage(); render();
   // first real press on start/stop removes the hint immediately
   document.addEventListener('iwc-chrono-push', function(e){ if(e.detail && e.detail.kind==='startStop') hideHint(); }, true);
 })();
-
-
 
 (function(){
   function runSingle(el){
@@ -351,8 +328,6 @@ fitStage(); render();
   scheduleRandomDouble(z16, 6500, 1100);
   scheduleRandomDouble(z17, 5500, 1000);
 })();
-
-
 
 (function(){
   const stage = document.querySelector('.stage');
@@ -464,14 +439,10 @@ fitStage(); render();
   applyTransform();
 })();
 
-
-
 try{
 if(window.tickSoft){ tickSoft.volume = 1.0; }
 if(window.tickLoud){ tickLoud.volume = 1.0; }
 }catch(e){}
-
-
 
 (function(){
 
@@ -561,3 +532,13 @@ function frame(now){
 requestAnimationFrame(frame);
 
 })();
+
+window.addEventListener('load',()=>{
+  document.documentElement.classList.remove('pwa-loading');
+  document.body.classList.add('app-ready');
+});
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(console.error);
+  });
+}

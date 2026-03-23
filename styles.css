@@ -1,5 +1,3 @@
-
-
 :root{
   --app-bg:#0a254d;
   --safe-top:env(safe-area-inset-top, 0px);
@@ -35,7 +33,8 @@ body{
     radial-gradient(circle at 50% 42%, #3f7dc0 0%, #2c66aa 24%, #1a4e87 48%, #0f3768 68%, #0a254d 100%);
   overflow:hidden;
 }
-.stageWrap{position:absolute;transform-origin:top left;will-change:transform,left,top;}
+.stageWrap{position:absolute;transform-origin:top left;will-change:transform,left,top;opacity:0;visibility:hidden;}
+.stageWrap.ready{opacity:1;visibility:visible;}
 .stage{position:relative;width:2456px;height:3070px;}
 .root{position:absolute;left:0;top:0;width:2456px;height:3070px;}
 .l{position:absolute;}
@@ -201,3 +200,7 @@ text-shadow:0 0 8px rgba(255,255,255,0.18);
 }
 /* CASE VIGNETTE END */
 
+/* PWA shell enhancements */
+html.pwa-loading .stageWrap{opacity:0 !important;visibility:hidden !important}
+body.app-ready{background:var(--app-bg)}
+img[loading="lazy"]{content-visibility:auto}
