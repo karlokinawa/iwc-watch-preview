@@ -2,22 +2,36 @@
   "name": "IWC Portuguese Grande Complication",
   "short_name": "IWC Watch",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0a254d",
   "theme_color": "#0a254d",
-  "description": "Offline-capable PWA using the exact IWC_MASTER_v3_fixed.html watch core.",
+  "description": "PWA shell for the exact uploaded IWC watch HTML, with externalized assets and offline caching.",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "iwc-preview.webp",
+      "sizes": "1170x1468",
+      "type": "image/webp",
+      "form_factor": "narrow"
     }
   ]
 }

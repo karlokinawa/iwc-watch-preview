@@ -1,51 +1,51 @@
-
-const CORE_CACHE = 'iwc-core-v1';
-const MEDIA_CACHE = 'iwc-media-v1';
-const CORE_ASSETS = ["index.html", "styles.css", "app.js", "manifest.json", "icon-192.png", "icon-512.png"];
-const MEDIA_EXTENSIONS = /\.(?:webp|png|jpg|jpeg|mp3|m4a)$/i;
+const CACHE_NAME = 'iwc-watch-pwa-v1';
+const APP_SHELL = [
+  "a2-background.webp",
+  "chronoclickaudio.m4a",
+  "cm.webp",
+  "cs.webp",
+  "debug-marker.webp",
+  "glint.webp",
+  "h.webp",
+  "icon-180.png",
+  "icon-192.png",
+  "icon-256.png",
+  "icon-512.png",
+  "index.html",
+  "iwc-original-watch.jpeg",
+  "iwc-preview.webp",
+  "m.webp",
+  "manifest.webmanifest",
+  "mo.webp",
+  "s.webp",
+  "service-worker.js",
+  "tg.webp",
+  "tickloudaudio.mp3",
+  "ticksoftaudio.mp3",
+  "wo.webp"
+];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CORE_CACHE).then(cache => cache.addAll(CORE_ASSETS)));
-  self.skipWaiting();
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys
-      .filter(key => ![CORE_CACHE, MEDIA_CACHE].includes(key))
-      .map(key => caches.delete(key)));
-    await self.clients.claim();
-  })());
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))).then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
-  const url = new URL(req.url);
-
-  if (url.origin !== self.location.origin) return;
-
-  if (CORE_ASSETS.some(asset => url.pathname.endsWith('/' + asset) || url.pathname === '/' || url.pathname.endsWith('/'))) {
-    event.respondWith((async () => {
-      const cache = await caches.open(CORE_CACHE);
-      const cached = await cache.match(req, { ignoreSearch: true }) || await cache.match('./index.html');
+  event.respondWith(
+    caches.match(req).then(cached => {
       if (cached) return cached;
-      const fresh = await fetch(req);
-      cache.put(req, fresh.clone());
-      return fresh;
-    })());
-    return;
-  }
-
-  if (MEDIA_EXTENSIONS.test(url.pathname)) {
-    event.respondWith((async () => {
-      const cache = await caches.open(MEDIA_CACHE);
-      const cached = await cache.match(req, { ignoreSearch: true });
-      if (cached) return cached;
-      const fresh = await fetch(req);
-      cache.put(req, fresh.clone());
-      return fresh;
-    })());
-  }
+      return fetch(req).then(response => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
+        return response;
+      }).catch(() => caches.match('index.html'));
+    })
+  );
 });
