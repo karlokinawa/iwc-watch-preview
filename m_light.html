@@ -230,6 +230,29 @@ text-shadow:0 0 8px rgba(255,255,255,0.18);
 <link rel="preload" as="image" href="image_007.png?v=6">
 <link rel="preload" as="image" href="image_008.png?v=6">
 
+<style id="iwc-light-performance">
+/* IWC5 Light: only visual/rendering reductions; geometry and logic unchanged */
+.glassTopGlow, .glassSweep, .glintLayer, .hintWrap { display:none !important; animation:none !important; filter:none !important; }
+.glassDialOverlay { display:none !important; }
+* { will-change:auto !important; }
+</style>
+<script>
+(function(){
+  /* Hide possible info overlays during pinch-like gestures without changing zoom logic */
+  var lastTouches = 0;
+  function hideInfo(){
+    try {
+      document.querySelectorAll('[id*="info"], [class*="info"], .infoOverlay, #infoOverlay').forEach(function(el){
+        if(el && getComputedStyle(el).display !== "none"){ el.style.display = "none"; }
+      });
+    } catch(e) {}
+  }
+  document.addEventListener("touchstart", function(e){ lastTouches = e.touches ? e.touches.length : 0; if(lastTouches > 1) hideInfo(); }, {passive:true});
+  document.addEventListener("touchmove", function(e){ if(e.touches && e.touches.length > 1) hideInfo(); }, {passive:true});
+})();
+</script>
+
+
 <!-- IWC6 explicit progressive dial preload -->
 <link rel="preload" as="image" href="A2_low.webp?v=6">
 <link rel="preload" as="image" href="A2.png?v=6">
